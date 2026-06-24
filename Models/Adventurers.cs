@@ -1,6 +1,6 @@
 ﻿namespace AdventureGuildApi.Models
 {
-    public class Adventurers
+    public class Adventurer
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
