@@ -1,9 +1,12 @@
 using AdventureGuildApi.Models;
+using AdventureGuildApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton<IAdventurerService, AdventurerService>();
 
 var app = builder.Build();
 
@@ -99,5 +102,23 @@ app.MapPut("/adventurers/{id}", (int id, Adventurer updatedAdventurer) =>
     return Results.Ok(existingAdventurer);
 })
 .WithName("UpdateAdventurer");
+
+app.MapDelete("/adventurers/{id}", (int id) =>
+{
+    var existingAventurer =
+        adventurers.FirstOrDefault(adventurer => adventurer.Id == id);
+
+    if (existingAventurer is null)
+    {
+        return Results.NotFound();
+    }
+
+    adventurers.Remove(existingAventurer);
+
+    return Results.NoContent();
+})
+.WithName("DeleteAdventurer");
+
+
 
 app.Run();
