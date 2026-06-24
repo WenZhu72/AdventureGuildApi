@@ -56,4 +56,16 @@ app.MapGet("/adventurers", () =>
 }).WithName("GetAdventurers");
 
 
+app.MapGet("/adventurers/{id}", (int id) =>
+{
+    var adventurer = adventurers.FirstOrDefault(a => a.Id == id);
+
+    if (adventurer == null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Ok(adventurer);
+}).WithName("GetAdventurerById");
+
 app.Run();
