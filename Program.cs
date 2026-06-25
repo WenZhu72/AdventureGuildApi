@@ -1,12 +1,19 @@
 using AdventureGuildApi.Models;
 using AdventureGuildApi.Services;
+using AdventureGuildApi.Data;
+
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<IAdventurerService, AdventurerService>();
+builder.Services.AddScoped<IAdventurerService, AdventurerService>();
+
+builder.Services.AddDbContext<AdventureGuildDbContext>(options =>
+options.UseSqlite("Data Source = adventureguild.db"));
+
 
 var app = builder.Build();
 
@@ -32,9 +39,11 @@ app.MapGet("/guild", () =>
 })
 .WithName("GetGuildInfo");
 
-app.MapGet("/adventurers", (IAdventurerService adventurerService) =>
+app.MapGet("/adventurers", async (IAdventurerService adventurerService) =>
 {
-    return Results.Ok(adventurerService.GetAll());
+    var adventurers = await adventurerService.GetAllAsync();
+
+    return Results.Ok(adventurers);
 })
 .WithName("GetAdventurers");
 

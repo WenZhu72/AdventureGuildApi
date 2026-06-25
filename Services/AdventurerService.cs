@@ -1,55 +1,41 @@
-﻿using AdventureGuildApi.Models;
+﻿using AdventureGuildApi.Data;
+using AdventureGuildApi.Models;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace AdventureGuildApi.Services;
 
 public class AdventurerService : IAdventurerService
 {
-    private readonly List<Adventurer> _adventurers = new()
-    {
-        new Adventurer
-        {
-            Id = 1,
-            Name = "Aria Hail Stormblade",
-            Level = 5,
-            GuildRank = "Bronze",
-            Gold = 120,
-            Experience = 450
-        },
-        new Adventurer
-        {
-            Id = 2,
-            Name = "Borin Ironfist",
-            Level = 8,
-            GuildRank = "Silver",
-            Gold = 300,
-            Experience = 1200
-        }
-    };
+    private readonly AdventureGuildDbContext _dbContext;
 
-    public List<Adventurer> GetAll()
+    public AdventurerService(AdventureGuildDbContext dbContext)
     {
-        return _adventurers;
+        _dbContext = dbContext;
     }
 
-    public Adventurer? GetById(int Id)
+    public async Task<List<Adventurer>> GetAllAsync()
     {
-        var foundAdventurer =
-            _adventurers.FirstOrDefault(adventurer => adventurer.Id == Id);
+        return await _dbContext.Adventurers.ToListAsync();
+    }
 
-        return foundAdventurer;
+    public Adventurer? GetById(int id)
+    {
+        return _dbContext.Adventurers.FirstOrDefault(adventurer => adventurer.Id == id);
     }
 
     public Adventurer Create(Adventurer newAdventurer)
     {
-        newAdventurer.Id = _adventurers.Max(adventurer => adventurer.Id) + 1;
-        _adventurers.Add(newAdventurer);
+        _dbContext.Adventurers.Add(newAdventurer);
+        _dbContext.SaveChanges();
+
         return newAdventurer;
     }
 
     public Adventurer? Update(int id, Adventurer updatedAdventurer)
     {
         var existingAdventurer =
-            _adventurers.FirstOrDefault(adventurer =>adventurer.Id == id);
+            _dbContext.Adventurers.FirstOrDefault(adventurer => adventurer.Id == id);
 
         if (existingAdventurer is null)
         {
@@ -62,20 +48,23 @@ public class AdventurerService : IAdventurerService
         existingAdventurer.Gold = updatedAdventurer.Gold;
         existingAdventurer.Experience = updatedAdventurer.Experience;
 
+        _dbContext.SaveChanges();
+
         return existingAdventurer;
     }
 
     public bool Delete(int id)
     {
         var existingAdventurer =
-            _adventurers.FirstOrDefault(adventurer => adventurer.Id == id);
+            _dbContext.Adventurers.FirstOrDefault(adventurer => adventurer.Id == id);
 
         if (existingAdventurer is null)
         {
             return false;
         }
 
-        _adventurers.Remove(existingAdventurer);
+        _dbContext.Adventurers.Remove(existingAdventurer);
+        _dbContext.SaveChanges();
 
         return true;
     }
