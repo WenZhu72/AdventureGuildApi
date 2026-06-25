@@ -10,27 +10,6 @@ builder.Services.AddSingleton<IAdventurerService, AdventurerService>();
 
 var app = builder.Build();
 
-var adventurers = new List<Adventurer>
-{
-    new Adventurer
-    {
-        Id = 1,
-        Name = "Aria Stormblade",
-        Level = 5,
-        GuildRank = "Bronze",
-        Gold = 120,
-        Experience = 450
-    },
-    new Adventurer
-    {
-        Id = 2,
-        Name = "Borin Ironfist",
-        Level = 8,
-        GuildRank = "Silver",
-        Gold = 300,
-        Experience = 1200
-    }
-};
 
 if (app.Environment.IsDevelopment())
 {
@@ -53,16 +32,15 @@ app.MapGet("/guild", () =>
 })
 .WithName("GetGuildInfo");
 
-app.MapGet("/adventurers", () =>
+app.MapGet("/adventurers", (IAdventurerService adventurerService) =>
 {
-    return Results.Ok(adventurers);
+    return Results.Ok(adventurerService.GetAll());
 })
 .WithName("GetAdventurers");
 
-app.MapGet("/adventurers/{id}", (int id) =>
+app.MapGet("/adventurers/{id}", (int id, IAdventurerService adventurerService) =>
 {
-    var foundAdventurer =
-        adventurers.FirstOrDefault(adventurer => adventurer.Id == id);
+    var foundAdventurer = adventurerService.GetById(id);
 
     if (foundAdventurer is null)
     {
@@ -73,52 +51,38 @@ app.MapGet("/adventurers/{id}", (int id) =>
 })
 .WithName("GetAdventurerById");
 
-app.MapPost("/adventurers", (Adventurer newAdventurer) =>
+app.MapPost("/adventurers", (Adventurer newAdventurer, IAdventurerService adventurerService) =>
 {
-    newAdventurer.Id = adventurers.Max(adventurer => adventurer.Id) + 1;
-
-    adventurers.Add(newAdventurer);
+    var createdAdventurer = adventurerService.Create(newAdventurer);
 
     return Results.Created($"/adventurers/{newAdventurer.Id}", newAdventurer);
 })
 .WithName("CreateAdventurer");
 
-app.MapPut("/adventurers/{id}", (int id, Adventurer updatedAdventurer) =>
+app.MapPut("/adventurers/{id}", (int id, Adventurer updatedAdventurer, IAdventurerService adventurerService) =>
 {
-    var existingAdventurer =
-        adventurers.FirstOrDefault(adventurer => adventurer.Id == id);
-
-    if (existingAdventurer is null)
+    var savedAdventurer = adventurerService.Update(id, updatedAdventurer);
+    
+    if (savedAdventurer is null)
     {
         return Results.NotFound();
     }
 
-    existingAdventurer.Name = updatedAdventurer.Name;
-    existingAdventurer.Level = updatedAdventurer.Level;
-    existingAdventurer.GuildRank = updatedAdventurer.GuildRank;
-    existingAdventurer.Gold = updatedAdventurer.Gold;
-    existingAdventurer.Experience = updatedAdventurer.Experience;
-
-    return Results.Ok(existingAdventurer);
+    return Results.Ok(savedAdventurer);
 })
 .WithName("UpdateAdventurer");
 
-app.MapDelete("/adventurers/{id}", (int id) =>
+app.MapDelete("/adventurers/{id}", (int id, IAdventurerService adventurerService) =>
 {
-    var existingAventurer =
-        adventurers.FirstOrDefault(adventurer => adventurer.Id == id);
-
-    if (existingAventurer is null)
+    var wasDeleted = adventurerService.Delete(id);
+    
+    if (!wasDeleted)
     {
         return Results.NotFound();
     }
-
-    adventurers.Remove(existingAventurer);
 
     return Results.NoContent();
 })
 .WithName("DeleteAdventurer");
-
-
 
 app.Run();
