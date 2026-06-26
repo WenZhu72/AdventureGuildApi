@@ -47,9 +47,9 @@ app.MapGet("/adventurers", async (IAdventurerService adventurerService) =>
 })
 .WithName("GetAdventurers");
 
-app.MapGet("/adventurers/{id}", (int id, IAdventurerService adventurerService) =>
+app.MapGet("/adventurers/{id}", async (int id, IAdventurerService adventurerService) =>
 {
-    var foundAdventurer = adventurerService.GetById(id);
+    Adventurer? foundAdventurer = await adventurerService.GetByIdAsync(id);
 
     if (foundAdventurer is null)
     {
@@ -60,24 +60,25 @@ app.MapGet("/adventurers/{id}", (int id, IAdventurerService adventurerService) =
 })
 .WithName("GetAdventurerById");
 
-app.MapPost("/adventurers", (Adventurer newAdventurer, IAdventurerService adventurerService) =>
+app.MapPost("/adventurers", async (Adventurer newAdventurer, IAdventurerService adventurerService) =>
 {
-    var createdAdventurer = adventurerService.Create(newAdventurer);
+    Adventurer createdAdventurer = await adventurerService.CreateAsync(newAdventurer);
 
     return Results.Created($"/adventurers/{newAdventurer.Id}", newAdventurer);
 })
 .WithName("CreateAdventurer");
 
-app.MapPut("/adventurers/{id}", (int id, Adventurer updatedAdventurer, IAdventurerService adventurerService) =>
+app.MapPut("/adventurers/{id}", async (int id, Adventurer updatedAdventurer, IAdventurerService adventurerService) =>
 {
-    var savedAdventurer = adventurerService.Update(id, updatedAdventurer);
+    Adventurer? updatedAdventurerResult
+    = await adventurerService.UpdateAsync(id, updatedAdventurer);
     
-    if (savedAdventurer is null)
+    if (updatedAdventurerResult is null)
     {
         return Results.NotFound();
     }
 
-    return Results.Ok(savedAdventurer);
+    return Results.Ok(updatedAdventurerResult);
 })
 .WithName("UpdateAdventurer");
 

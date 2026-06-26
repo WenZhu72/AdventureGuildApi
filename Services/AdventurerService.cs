@@ -19,23 +19,23 @@ public class AdventurerService : IAdventurerService
         return await _dbContext.Adventurers.ToListAsync();
     }
 
-    public Adventurer? GetById(int id)
+    public async Task<Adventurer?> GetByIdAsync(int id)
     {
-        return _dbContext.Adventurers.FirstOrDefault(adventurer => adventurer.Id == id);
+        return await _dbContext.Adventurers.FindAsync(id);
     }
 
-    public Adventurer Create(Adventurer newAdventurer)
+    public async Task<Adventurer> CreateAsync(Adventurer newAdventurer)
     {
         _dbContext.Adventurers.Add(newAdventurer);
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
 
         return newAdventurer;
     }
 
-    public Adventurer? Update(int id, Adventurer updatedAdventurer)
+    public async Task<Adventurer?> UpdateAsync(int id, Adventurer updatedAdventurer)
     {
         var existingAdventurer =
-            _dbContext.Adventurers.FirstOrDefault(adventurer => adventurer.Id == id);
+            await _dbContext.Adventurers.FindAsync(id);
 
         if (existingAdventurer is null)
         {
@@ -48,15 +48,15 @@ public class AdventurerService : IAdventurerService
         existingAdventurer.Gold = updatedAdventurer.Gold;
         existingAdventurer.Experience = updatedAdventurer.Experience;
 
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
 
         return existingAdventurer;
     }
 
-    public bool Delete(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
         var existingAdventurer =
-            _dbContext.Adventurers.FirstOrDefault(adventurer => adventurer.Id == id);
+            await _dbContext.Adventurers.FindAsync(id);
 
         if (existingAdventurer is null)
         {
@@ -64,7 +64,8 @@ public class AdventurerService : IAdventurerService
         }
 
         _dbContext.Adventurers.Remove(existingAdventurer);
-        _dbContext.SaveChanges();
+        
+        await _dbContext.SaveChangesAsync();
 
         return true;
     }
