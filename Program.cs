@@ -1,6 +1,7 @@
 using AdventureGuildApi.Models;
 using AdventureGuildApi.Services;
 using AdventureGuildApi.Data;
+using AdventureGuildApi.Dtos;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -60,16 +61,35 @@ app.MapGet("/adventurers/{id}", async (int id, IAdventurerService adventurerServ
 })
 .WithName("GetAdventurerById");
 
-app.MapPost("/adventurers", async (Adventurer newAdventurer, IAdventurerService adventurerService) =>
+app.MapPost("/adventurers", async (CreateAdventurerDto createAdventurerDto, IAdventurerService adventurerService) =>
 {
+    Adventurer newAdventurer = new Adventurer
+    {
+        Name = createAdventurerDto.Name,
+        Level = createAdventurerDto.Level,
+        GuildRank = createAdventurerDto.GuildRank,
+        Gold = createAdventurerDto.Gold,
+        Experience = createAdventurerDto.Experience
+    };
+
     Adventurer createdAdventurer = await adventurerService.CreateAsync(newAdventurer);
 
-    return Results.Created($"/adventurers/{newAdventurer.Id}", newAdventurer);
+    return Results.Created($"/adventurers/{createdAdventurer.Id}", createdAdventurer);
 })
 .WithName("CreateAdventurer");
 
-app.MapPut("/adventurers/{id}", async (int id, Adventurer updatedAdventurer, IAdventurerService adventurerService) =>
+app.MapPut("/adventurers/{id}", async (int id, UpdateAdventurerDto updateAdventurerDto, IAdventurerService adventurerService) =>
 {
+    Adventurer updatedAdventurer = new Adventurer
+    {
+        Name = updateAdventurerDto.Name,
+        Level = updateAdventurerDto.Level,
+        GuildRank = updateAdventurerDto.GuildRank,
+        Gold = updateAdventurerDto.Gold,
+        Experience = updateAdventurerDto.Experience
+    };
+
+
     Adventurer? updatedAdventurerResult
     = await adventurerService.UpdateAsync(id, updatedAdventurer);
     
@@ -82,9 +102,9 @@ app.MapPut("/adventurers/{id}", async (int id, Adventurer updatedAdventurer, IAd
 })
 .WithName("UpdateAdventurer");
 
-app.MapDelete("/adventurers/{id}", (int id, IAdventurerService adventurerService) =>
+app.MapDelete("/adventurers/{id}", async (int id, IAdventurerService adventurerService) =>
 {
-    var wasDeleted = adventurerService.Delete(id);
+    bool wasDeleted = await adventurerService.DeleteAsync(id);
     
     if (!wasDeleted)
     {
