@@ -2,6 +2,7 @@ using AdventureGuildApi.Models;
 using AdventureGuildApi.Services;
 using AdventureGuildApi.Data;
 using AdventureGuildApi.Dtos;
+using AdventureGuildApi.Mappings;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -42,9 +43,13 @@ app.MapGet("/guild", () =>
 
 app.MapGet("/adventurers", async (IAdventurerService adventurerService) =>
 {
-    var adventurers = await adventurerService.GetAllAsync();
+    List<Adventurer> adventurers = await adventurerService.GetAllAsync();
 
-    return Results.Ok(adventurers);
+    List<AdventurerResponseDto> adventurerResponseDtos = adventurers
+    .Select(adventurer => adventurer.ToResponseDto())
+    .ToList();
+
+    return Results.Ok(adventurerResponseDtos);
 })
 .WithName("GetAdventurers");
 
@@ -57,7 +62,7 @@ app.MapGet("/adventurers/{id}", async (int id, IAdventurerService adventurerServ
         return Results.NotFound();
     }
 
-    return Results.Ok(foundAdventurer);
+    return Results.Ok(foundAdventurer.ToResponseDto());
 })
 .WithName("GetAdventurerById");
 
@@ -74,7 +79,9 @@ app.MapPost("/adventurers", async (CreateAdventurerDto createAdventurerDto, IAdv
 
     Adventurer createdAdventurer = await adventurerService.CreateAsync(newAdventurer);
 
-    return Results.Created($"/adventurers/{createdAdventurer.Id}", createdAdventurer);
+    AdventurerResponseDto adventurerResponseDto = createdAdventurer.ToResponseDto();
+
+    return Results.Created($"/adventurers/{adventurerResponseDto.Id}", adventurerResponseDto);
 })
 .WithName("CreateAdventurer");
 
@@ -98,7 +105,9 @@ app.MapPut("/adventurers/{id}", async (int id, UpdateAdventurerDto updateAdventu
         return Results.NotFound();
     }
 
-    return Results.Ok(updatedAdventurerResult);
+    AdventurerResponseDto adventurerResponseDto = updatedAdventurerResult.ToResponseDto();
+
+    return Results.Ok(adventurerResponseDto);
 })
 .WithName("UpdateAdventurer");
 
