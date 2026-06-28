@@ -16,9 +16,7 @@ builder.Services.AddScoped<IAdventurerService, AdventurerService>();
 builder.Services.AddDbContext<AdventureGuildDbContext>(options =>
 options.UseSqlite("Data Source = adventureguild.db"));
 
-
 var app = builder.Build();
-
 
 if (app.Environment.IsDevelopment())
 {
@@ -68,14 +66,7 @@ app.MapGet("/adventurers/{id}", async (int id, IAdventurerService adventurerServ
 
 app.MapPost("/adventurers", async (CreateAdventurerDto createAdventurerDto, IAdventurerService adventurerService) =>
 {
-    Adventurer newAdventurer = new Adventurer
-    {
-        Name = createAdventurerDto.Name,
-        Level = createAdventurerDto.Level,
-        GuildRank = createAdventurerDto.GuildRank,
-        Gold = createAdventurerDto.Gold,
-        Experience = createAdventurerDto.Experience
-    };
+    Adventurer newAdventurer = createAdventurerDto.ToEntity();
 
     Adventurer createdAdventurer = await adventurerService.CreateAsync(newAdventurer);
 
