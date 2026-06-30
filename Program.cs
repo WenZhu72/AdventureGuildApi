@@ -8,6 +8,7 @@ using AdventureGuildApi.Validators;
 using AdventureGuildApi.Infrastructure.Filters;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +58,7 @@ app.MapGet("/adventurers", async (IAdventurerService adventurerService) =>
 
     return Results.Ok(adventurerResponseDtos);
 })
+.Produces<List<AdventurerResponseDto>>(StatusCodes.Status200OK)
 .WithName("GetAdventurers");
 
 app.MapGet("/adventurers/{id}", async (int id, IAdventurerService adventurerService) =>
@@ -70,6 +72,8 @@ app.MapGet("/adventurers/{id}", async (int id, IAdventurerService adventurerServ
 
     return Results.Ok(foundAdventurer.ToResponseDto());
 })
+.Produces<AdventurerResponseDto>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound)
 .WithName("GetAdventurerById");
 
 app.MapPost("/adventurers", async (
@@ -86,6 +90,8 @@ app.MapPost("/adventurers", async (
     return Results.Created($"/adventurers/{adventurerResponseDto.Id}", adventurerResponseDto);
 })
 .AddEndpointFilter<ValidationFilter<CreateAdventurerDto>>()
+.Produces<AdventurerResponseDto>(StatusCodes.Status201Created)
+.Produces(StatusCodes.Status400BadRequest)
 .WithName("CreateAdventurer");
 
 app.MapPut("/adventurers/{id}", async (int id, 
@@ -108,6 +114,9 @@ app.MapPut("/adventurers/{id}", async (int id,
     return Results.Ok(adventurerResponseDto);
 })
 .AddEndpointFilter<ValidationFilter<UpdateAdventurerDto>>()
+.Produces<AdventurerResponseDto>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status404NotFound)
 .WithName("UpdateAdventurer");
 
 app.MapDelete("/adventurers/{id}", async (int id, IAdventurerService adventurerService) =>
@@ -121,6 +130,8 @@ app.MapDelete("/adventurers/{id}", async (int id, IAdventurerService adventurerS
 
     return Results.NoContent();
 })
+.Produces(StatusCodes.Status204NoContent)
+.Produces(StatusCodes.Status404NotFound)
 .WithName("DeleteAdventurer");
 
 app.Run();
