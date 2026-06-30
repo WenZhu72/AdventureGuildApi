@@ -3,6 +3,9 @@ using AdventureGuildApi.Services;
 using AdventureGuildApi.Data;
 using AdventureGuildApi.Dtos;
 using AdventureGuildApi.Mappings;
+using AdventureGuildApi.Validators;
+
+using AdventureGuildApi.Infrastructure.Filters;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +15,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IAdventurerService, AdventurerService>();
+
+builder.Services.AddScoped<IValidator<CreateAdventurerDto>, CreateAdventurerDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateAdventurerDto>, UpdateAdventurerDtoValidator>();
+
+builder.Services.AddScoped(typeof(ValidationFilter<>));
 
 builder.Services.AddDbContext<AdventureGuildDbContext>(options =>
 options.UseSqlite("Data Source = adventureguild.db"));
@@ -64,7 +72,10 @@ app.MapGet("/adventurers/{id}", async (int id, IAdventurerService adventurerServ
 })
 .WithName("GetAdventurerById");
 
-app.MapPost("/adventurers", async (CreateAdventurerDto createAdventurerDto, IAdventurerService adventurerService) =>
+app.MapPost("/adventurers", async (
+    CreateAdventurerDto createAdventurerDto,
+    IValidator<CreateAdventurerDto> validator,
+    IAdventurerService adventurerService) =>
 {
     Adventurer newAdventurer = createAdventurerDto.ToEntity();
 
@@ -74,19 +85,25 @@ app.MapPost("/adventurers", async (CreateAdventurerDto createAdventurerDto, IAdv
 
     return Results.Created($"/adventurers/{adventurerResponseDto.Id}", adventurerResponseDto);
 })
+.AddEndpointFilter<ValidationFilter<CreateAdventurerDto>>()
 .WithName("CreateAdventurer");
 
-app.MapPut("/adventurers/{id}", async (int id, UpdateAdventurerDto updateAdventurerDto, IAdventurerService adventurerService) =>
+app.MapPut("/adventurers/{id}", async (int id, 
+    UpdateAdventurerDto updateAdventurerDto,
+    IValidator<UpdateAdventurerDto> validator,
+    IAdventurerService adventurerService) =>
 {
-    Adventurer updatedAdventurer = new Adventurer
-    {
-        Name = updateAdventurerDto.Name,
-        Level = updateAdventurerDto.Level,
-        GuildRank = updateAdventurerDto.GuildRank,
-        Gold = updateAdventurerDto.Gold,
-        Experience = updateAdventurerDto.Experience
-    };
+    List<string> validationErrors = validator.Validate(updateAdventurerDto);
 
+    if (validationErrors.Any())
+    {
+        return Results.BadRequest(new
+        {
+            Errors = validationErrors
+        });
+    }
+
+    Adventurer updatedAdventurer = updateAdventurerDto.ToEntity();
 
     Adventurer? updatedAdventurerResult
     = await adventurerService.UpdateAsync(id, updatedAdventurer);

@@ -29,5 +29,17 @@ namespace AdventureGuildApi.Mappings
                 Experience = createAdventurerDto.Experience
             };
         }
+
+        public static Adventurer ToEntity(this UpdateAdventurerDto updateAdventurerDto)
+        {
+            return new Adventurer
+            {
+                Name = updateAdventurerDto.Name,
+                Level = updateAdventurerDto.Level,
+                GuildRank = updateAdventurerDto.GuildRank,
+                Gold = updateAdventurerDto.Gold,
+                Experience = updateAdventurerDto.Experience
+            };
+        }
     }
 }
