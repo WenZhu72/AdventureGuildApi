@@ -91,7 +91,7 @@ app.MapPost("/adventurers", async (
 })
 .AddEndpointFilter<ValidationFilter<CreateAdventurerDto>>()
 .Produces<AdventurerResponseDto>(StatusCodes.Status201Created)
-.Produces(StatusCodes.Status400BadRequest)
+.Produces<ValidationErrorResponseDto>(StatusCodes.Status400BadRequest)
 .WithName("CreateAdventurer");
 
 app.MapPut("/adventurers/{id}", async (int id, 
@@ -115,7 +115,7 @@ app.MapPut("/adventurers/{id}", async (int id,
 })
 .AddEndpointFilter<ValidationFilter<UpdateAdventurerDto>>()
 .Produces<AdventurerResponseDto>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status400BadRequest)
+.Produces<ValidationErrorResponseDto>(StatusCodes.Status400BadRequest)
 .Produces(StatusCodes.Status404NotFound)
 .WithName("UpdateAdventurer");
 

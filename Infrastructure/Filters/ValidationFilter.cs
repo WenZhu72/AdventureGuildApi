@@ -1,4 +1,5 @@
 ﻿using AdventureGuildApi.Validators;
+using AdventureGuildApi.Dtos;
 
 using Microsoft.AspNetCore.Http;
 
@@ -33,7 +34,7 @@ namespace AdventureGuildApi.Infrastructure.Filters
 
             if (validationErrors.Any())
             {
-                return Results.BadRequest(new
+                return Results.BadRequest(new ValidationErrorResponseDto
                 {
                     Errors = validationErrors
                 });
