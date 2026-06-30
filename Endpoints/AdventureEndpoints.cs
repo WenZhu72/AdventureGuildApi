@@ -10,7 +10,9 @@ public static class AdventurerEndpoints
 {
     public static WebApplication MapAdventurerEndpoints(this WebApplication app)
     {
-        app.MapGet("/adventurers", async (IAdventurerService adventurerService) =>
+        var adventurers = app.MapGroup("/adventurers");
+
+        adventurers.MapGet("/", async (IAdventurerService adventurerService) =>
         {
             List<Adventurer> adventurers = await adventurerService.GetAllAsync();
 
@@ -23,7 +25,7 @@ public static class AdventurerEndpoints
         .Produces<List<AdventurerResponseDto>>(StatusCodes.Status200OK)
         .WithName("GetAdventurers");
 
-        app.MapGet("/adventurers/{id}", async (int id, IAdventurerService adventurerService) =>
+        adventurers.MapGet("/{id}", async (int id, IAdventurerService adventurerService) =>
         {
             Adventurer? foundAdventurer = await adventurerService.GetByIdAsync(id);
 
@@ -40,7 +42,7 @@ public static class AdventurerEndpoints
         .Produces(StatusCodes.Status404NotFound)
         .WithName("GetAdventurerById");
 
-        app.MapPost("/adventurers", async (
+        adventurers.MapPost("/", async (
             CreateAdventurerDto createAdventurerDto,
             IAdventurerService adventurerService) =>
         {
@@ -57,7 +59,7 @@ public static class AdventurerEndpoints
         .Produces<ValidationErrorResponseDto>(StatusCodes.Status400BadRequest)
         .WithName("CreateAdventurer");
 
-        app.MapPut("/adventurers/{id}", async (
+        adventurers.MapPut("/{id}", async (
             int id,
             UpdateAdventurerDto updateAdventurerDto,
             IAdventurerService adventurerService) =>
@@ -81,7 +83,7 @@ public static class AdventurerEndpoints
         .Produces(StatusCodes.Status404NotFound)
         .WithName("UpdateAdventurer");
 
-        app.MapDelete("/adventurers/{id}", async (
+        adventurers.MapDelete("/{id}", async (
             int id,
             IAdventurerService adventurerService) =>
         {
