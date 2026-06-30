@@ -93,16 +93,6 @@ app.MapPut("/adventurers/{id}", async (int id,
     IValidator<UpdateAdventurerDto> validator,
     IAdventurerService adventurerService) =>
 {
-    List<string> validationErrors = validator.Validate(updateAdventurerDto);
-
-    if (validationErrors.Any())
-    {
-        return Results.BadRequest(new
-        {
-            Errors = validationErrors
-        });
-    }
-
     Adventurer updatedAdventurer = updateAdventurerDto.ToEntity();
 
     Adventurer? updatedAdventurerResult
@@ -117,6 +107,7 @@ app.MapPut("/adventurers/{id}", async (int id,
 
     return Results.Ok(adventurerResponseDto);
 })
+.AddEndpointFilter<ValidationFilter<UpdateAdventurerDto>>()
 .WithName("UpdateAdventurer");
 
 app.MapDelete("/adventurers/{id}", async (int id, IAdventurerService adventurerService) =>
