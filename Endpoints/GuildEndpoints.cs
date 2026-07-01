@@ -4,7 +4,9 @@ public static class GuildEndpoints
 {
     public static WebApplication MapGuildEndpoints(this WebApplication app)
     {
-        app.MapGet("/guild", () =>
+        var guild = app.MapGroup("/guild").WithTags("Guild");
+
+        guild.MapGet("/", () =>
         {
             var guildInfo = new
             {

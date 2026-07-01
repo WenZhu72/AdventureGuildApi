@@ -10,7 +10,7 @@ public static class AdventurerEndpoints
 {
     public static WebApplication MapAdventurerEndpoints(this WebApplication app)
     {
-        var adventurers = app.MapGroup("/adventurers");
+        var adventurers = app.MapGroup("/adventurers").WithTags("Adventurers");
 
         adventurers.MapGet("/", async (IAdventurerService adventurerService) =>
         {
