@@ -1,9 +1,11 @@
 using AdventureGuildApi.Data;
 using AdventureGuildApi.Dtos;
 using AdventureGuildApi.Endpoints;
-using AdventureGuildApi.Infrastructure.Filters;
 using AdventureGuildApi.Services;
 using AdventureGuildApi.Validators;
+
+using AdventureGuildApi.Infrastructure.Filters;
+using AdventureGuildApi.Infrastructure.ExceptionHandling;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +21,9 @@ builder.Services.AddScoped<IValidator<UpdateAdventurerDto>, UpdateAdventurerDtoV
 
 builder.Services.AddScoped(typeof(ValidationFilter<>));
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddDbContext<AdventureGuildDbContext>(options =>
     options.UseSqlite("Data Source = adventureguild.db"));
 
@@ -31,6 +36,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseExceptionHandler();
 
 app.MapGuildEndpoints();
 app.MapAdventurerEndpoints();
