@@ -1,4 +1,5 @@
 ﻿using AdventureGuildApi.Dtos;
+using AdventureGuildApi.Infrastructure.Filters;
 using AdventureGuildApi.Validators;
 
 namespace AdventureGuildApi.Infrastructure.DependencyInjection
@@ -13,6 +14,8 @@ namespace AdventureGuildApi.Infrastructure.DependencyInjection
 
             services.AddScoped<IValidator<UpdateAdventurerDto>,
                 UpdateAdventurerDtoValidator>();
+
+            services.AddScoped(typeof(ValidationFilter<>));
 
             return services;
         }

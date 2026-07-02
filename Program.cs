@@ -1,31 +1,15 @@
-using AdventureGuildApi.Data;
-using AdventureGuildApi.Dtos;
 using AdventureGuildApi.Endpoints;
-using AdventureGuildApi.Services;
-using AdventureGuildApi.Validators;
-
-using AdventureGuildApi.Infrastructure.Filters;
-using AdventureGuildApi.Infrastructure.ExceptionHandling;
 using AdventureGuildApi.Infrastructure.DependencyInjection;
-
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IAdventurerService, AdventurerService>();
-
-builder.Services.AddScoped<IValidator<CreateAdventurerDto>, CreateAdventurerDtoValidator>();
-builder.Services.AddScoped<IValidator<UpdateAdventurerDto>, UpdateAdventurerDtoValidator>();
-
-builder.Services.AddScoped(typeof(ValidationFilter<>));
-
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
-
 builder.Services.AddDatabase(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddValidationServices();
+builder.Services.AddExceptionHandling();
 
 var app = builder.Build();
 
