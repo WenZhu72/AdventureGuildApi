@@ -6,7 +6,7 @@ public static class GuildEndpoints
     {
         var guild = app.MapGroup("/guild").WithTags("Guild");
 
-        app.MapGet("/", () =>
+        guild.MapGet("/", () =>
         {
             var guildInfo = new
             {

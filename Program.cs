@@ -6,6 +6,7 @@ using AdventureGuildApi.Validators;
 
 using AdventureGuildApi.Infrastructure.Filters;
 using AdventureGuildApi.Infrastructure.ExceptionHandling;
+using AdventureGuildApi.Infrastructure.DependencyInjection;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -24,8 +25,7 @@ builder.Services.AddScoped(typeof(ValidationFilter<>));
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-builder.Services.AddDbContext<AdventureGuildDbContext>(options =>
-    options.UseSqlite("Data Source = adventureguild.db"));
+builder.Services.AddDatabase(builder.Configuration);
 
 var app = builder.Build();
 
