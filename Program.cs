@@ -1,5 +1,6 @@
 using AdventureGuildApi.Endpoints;
 using AdventureGuildApi.Infrastructure.DependencyInjection;
+using AdventureGuildApi.Infrastructure.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseExceptionHandler();
+
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.MapGuildEndpoints();
 app.MapAdventurerEndpoints();

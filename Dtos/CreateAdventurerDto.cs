@@ -4,8 +4,6 @@ namespace AdventureGuildApi.Dtos
 {
     public class CreateAdventurerDto
     {
-        [Required]
-        [MinLength(1)]
         public string Name { get; set; } = string.Empty;
         public int Level {  get; set; }
         public string GuildRank { get; set; } = string.Empty;
